@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cap Études — Organisateur de révisions</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css">
+<link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+<div class="app-shell flex min-h-screen">
+  <!-- Sidebar -->
+  <aside class="w-64 glass border-r border-slate-700/50 p-5 flex flex-col sticky top-0 h-screen">
+    <div class="sidebar-brand flex items-center gap-3 mb-8">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </div>
+      <div>
+        <h1 class="font-bold text-lg leading-tight">Cap Études</h1>
+        <p class="text-xs text-slate-400">Organise tes révisions</p>
+      </div>
+    </div>
+
+    <nav class="app-nav flex flex-col gap-1 flex-1" aria-label="Navigation principale">
+      <button data-tab="dashboard" class="nav-btn tab-active flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium border border-transparent text-left">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Tableau de bord
+      </button>
+      <button data-tab="tasks" class="nav-btn flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium border border-transparent text-left text-slate-300 hover:bg-slate-700/40">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Tâches
+      </button>
+      <button data-tab="calendar" class="nav-btn flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium border border-transparent text-left text-slate-300 hover:bg-slate-700/40">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendrier
+      </button>
+      <button data-tab="timer" class="nav-btn flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium border border-transparent text-left text-slate-300 hover:bg-slate-700/40">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Minuteur
+      </button>
+      <button data-tab="stats" class="nav-btn flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium border border-transparent text-left text-slate-300 hover:bg-slate-700/40">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Statistiques
+      </button>
+    </nav>
+
+    <div class="weekly-goal glass rounded-xl p-4 mt-4">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs text-slate-400">Objectif hebdomadaire</span>
+        <span id="goalPercent" class="text-xs font-semibold text-violet-300">0%</span>
+      </div>
+      <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+        <div id="goalBar" class="h-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all" style="width:0%"></div>
+      </div>
+      <p class="text-[11px] text-slate-500 mt-2"><span id="goalDone">0</span> / <span id="goalTotal">0</span> tâches terminées</p>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main-content flex-1 min-w-0 p-8 overflow-x-hidden">
+    <!-- Top bar -->
+    <div class="page-topbar flex items-center justify-between mb-8">
+      <div>
+        <h2 id="pageTitle" class="text-2xl font-bold">Tableau de bord</h2>
+        <p id="pageSubtitle" class="text-sm text-slate-400">Prêt à avancer ? Organisons ta journée.</p>
+      </div>
+      <div class="page-actions flex items-center gap-3">
+        <div class="today-date glass rounded-lg px-4 py-2 text-sm">
+          <span class="text-slate-400">Aujourd’hui :</span>
+          <span id="todayDate" class="font-semibold ml-1"></span>
+        </div>
+        <button onclick="openTaskModal()" class="new-task-button btn-primary px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Nouvelle tâche
+        </button>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <section id="view-dashboard" class="view fade-in">
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        <div class="glass rounded-xl p-5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-slate-400 uppercase tracking-wide">Total des tâches</span>
+            <div class="w-8 h-8 rounded-lg bg-violet-500/20 flex items-center justify-center">
+              <svg class="w-4 h-4 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            </div>
+          </div>
+          <p id="statTotal" class="text-3xl font-bold">0</p>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-slate-400 uppercase tracking-wide">Terminées</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+          <p id="statDone" class="text-3xl font-bold">0</p>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-slate-400 uppercase tracking-wide">À faire</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+              <svg class="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+          </div>
+          <p id="statPending" class="text-3xl font-bold">0</p>
+        </div>
+        <div class="glass rounded-xl p-5">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-slate-400 uppercase tracking-wide">Heures de concentration</span>
+            <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+              <svg class="w-4 h-4 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            </div>
+          </div>
+          <p id="statHours" class="text-3xl font-bold">0<span class="text-lg text-slate-400 ml-1">h</span></p>
+        </div>
+      </div>
+
+      <div class="dashboard-grid grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="dashboard-panel xl:col-span-2 glass rounded-xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-lg">Tâches du jour</h3>
+            <span class="text-xs text-slate-400" id="todayCount">0 tâche</span>
+          </div>
+          <div id="todayTasks" class="space-y-3 max-h-[400px] overflow-y-auto scrollbar pr-2"></div>
+        </div>
+
+        <div class="dashboard-panel glass rounded-xl p-6">
+          <h3 class="font-semibold text-lg mb-4">Échéances à venir</h3>
+          <div id="upcomingTasks" class="space-y-3 max-h-[400px] overflow-y-auto scrollbar pr-2"></div>
+        </div>
+      </div>
+
+      <div class="dashboard-panel glass rounded-xl p-6 mt-6">
+        <h3 class="font-semibold text-lg mb-4">Progression de la semaine</h3>
+        <canvas id="weeklyChart" height="100"></canvas>
+      </div>
+    </section>
+
+    <!-- Tasks -->
+    <section id="view-tasks" class="view hidden fade-in">
+      <div class="task-filters glass rounded-xl p-4 mb-6">
+        <div class="task-filter-selects">
+          <select id="filterSubject" class="px-4 py-2 rounded-lg text-sm">
+            <option value="">Toutes les matières</option>
+          </select>
+          <select id="filterPriority" class="px-4 py-2 rounded-lg text-sm">
+            <option value="">Toutes les priorités</option>
+            <option value="high">Élevée</option>
+            <option value="medium">Moyenne</option>
+            <option value="low">Faible</option>
+          </select>
+          <select id="filterStatus" class="px-4 py-2 rounded-lg text-sm">
+            <option value="">Tous les états</option>
+            <option value="pending">À faire</option>
+            <option value="done">Terminée</option>
+          </select>
+        </div>
+        <div class="task-filter-tools">
+          <input id="searchInput" type="text" placeholder="Rechercher une tâche…" class="px-4 py-2 rounded-lg text-sm"/>
+          <button onclick="openSubjectModal()" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-700 hover:bg-slate-600 transition">+ Matière</button>
+        </div>
+      </div>
+
+      <div id="taskList" class="space-y-3"></div>
+      <div id="emptyTasks" class="hidden glass rounded-xl p-12 text-center">
+        <svg class="w-16 h-16 mx-auto text-slate-600 mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <h3 class="font-semibold text-lg mb-1">Aucune tâche pour le moment</h3>
+        <p class="text-sm text-slate-400 mb-4">Crée ta première tâche pour organiser tes révisions.</p>
+        <button onclick="openTaskModal()" class="btn-primary px-5 py-2 rounded-lg text-sm font-semibold">Créer une tâche</button>
+      </div>
+    </section>
+
+    <!-- Calendar -->
+    <section id="view-calendar" class="view hidden fade-in">
+      <div class="calendar-panel glass rounded-xl p-6">
+        <div class="calendar-toolbar flex items-center justify-between mb-6">
+          <button onclick="changeWeek(-1)" aria-label="Semaine précédente" class="p-2 rounded-lg hover:bg-slate-700 transition">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <h3 id="weekLabel" class="font-semibold text-lg"></h3>
+          <div class="flex gap-2">
+            <button onclick="goToday()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-700 hover:bg-slate-600 transition">Aujourd’hui</button>
+            <button onclick="changeWeek(1)" aria-label="Semaine suivante" class="p-2 rounded-lg hover:bg-slate-700 transition">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="calendar-weekdays grid grid-cols-7 gap-2 mb-2">
+          <div class="text-center text-xs font-semibold text-slate-400 py-2">LUN.</div>
+          <div class="text-center text-xs font-semibold text-slate-400 py-2">MAR.</div>
+          <div class="text-center text-xs font-semibold text-slate-400 py-2">MER.</div>
+          <div class="text-center text-xs font-semibold text-slate-400 py-2">JEU.</div>
+          <div class="text-center text-xs font-semibold text-slate-400 py-2">VEN.</div>
+          <div class="text-center text-xs font-semibold text-slate-400 py-2">SAM.</div>
+          <div class="text-center text-xs font-semibold text-slate-400 py-2">DIM.</div>
+        </div>
+        <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+      </div>
+    </section>
+
+    <!-- Timer -->
+    <section id="view-timer" class="view hidden fade-in">
+      <div class="max-w-2xl mx-auto">
+        <div class="timer-panel glass rounded-xl p-8 text-center">
+          <div class="timer-modes flex justify-center gap-2 mb-8">
+            <button data-mode="focus" onclick="setTimerMode('focus')" class="timer-mode tab-active px-4 py-2 rounded-lg text-sm font-medium border border-transparent">Concentration (25 min)</button>
+            <button data-mode="short" onclick="setTimerMode('short')" class="timer-mode px-4 py-2 rounded-lg text-sm font-medium border border-transparent text-slate-300 hover:bg-slate-700/40">Pause courte (5 min)</button>
+            <button data-mode="long" onclick="setTimerMode('long')" class="timer-mode px-4 py-2 rounded-lg text-sm font-medium border border-transparent text-slate-300 hover:bg-slate-700/40">Pause longue (15 min)</button>
+          </div>
+
+          <div class="timer-clock relative w-72 h-72 mx-auto mb-8">
+            <svg class="w-full h-full -rotate-90" viewBox="0 0 200 200">
+              <circle cx="100" cy="100" r="90" stroke="#334155" stroke-width="8" fill="none"/>
+              <circle id="timerCircle" cx="100" cy="100" r="90" stroke="url(#grad)" stroke-width="8" fill="none"
+                      stroke-dasharray="565.48" stroke-dashoffset="0" stroke-linecap="round" style="transition: stroke-dashoffset 1s linear"/>
+              <defs>
+                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#8b5cf6"/>
+                  <stop offset="100%" stop-color="#6366f1"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <div id="timerDisplay" class="timer-clock-display text-6xl font-bold tracking-tight">25:00</div>
+              <div id="timerLabel" class="text-sm text-slate-400 mt-2">Session de concentration</div>
+            </div>
+          </div>
+
+          <div class="timer-controls flex justify-center gap-3 mb-6">
+            <button id="startBtn" onclick="toggleTimer()" class="btn-primary px-8 py-3 rounded-xl font-semibold flex items-center gap-2">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Démarrer
+            </button>
+            <button onclick="resetTimer()" class="px-6 py-3 rounded-xl font-semibold bg-slate-700 hover:bg-slate-600 transition">Réinitialiser</button>
+          </div>
+
+          <div class="timer-stats flex justify-center gap-6 text-sm">
+            <div>
+              <p class="text-slate-400 text-xs">Sessions aujourd’hui</p>
+              <p id="sessionCount" class="text-2xl font-bold">0</p>
+            </div>
+            <div>
+              <p class="text-slate-400 text-xs">Temps concentré</p>
+              <p id="totalFocus" class="text-2xl font-bold">0m</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass rounded-xl p-6 mt-6">
+          <h3 class="font-semibold mb-4">Associer une tâche au minuteur</h3>
+          <select id="timerTask" class="w-full px-4 py-2 rounded-lg text-sm">
+            <option value="">Aucune tâche associée</option>
+          </select>
+          <p class="text-xs text-slate-400 mt-2">Les sessions terminées seront ajoutées à la tâche sélectionnée.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section id="view-stats" class="view hidden fade-in">
+      <div class="stats-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="stats-panel chart-panel glass rounded-xl p-6">
+          <h3 class="font-semibold text-lg mb-4">Tâches par matière</h3>
+          <canvas id="subjectChart" height="200"></canvas>
+        </div>
+        <div class="stats-panel chart-panel glass rounded-xl p-6">
+          <h3 class="font-semibold text-lg mb-4">État des tâches</h3>
+          <canvas id="completionChart" height="200"></canvas>
+        </div>
+        <div class="stats-panel chart-panel glass rounded-xl p-6 lg:col-span-2">
+          <h3 class="font-semibold text-lg mb-4">Temps de concentration (7 derniers jours)</h3>
+          <canvas id="focusChart" height="80"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Task Modal -->
+<div id="taskModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="modal-panel glass rounded-2xl w-full max-w-lg p-6 fade-in">
+    <div class="flex items-center justify-between mb-5">
+      <h3 id="modalTitle" class="text-xl font-bold">Nouvelle tâche</h3>
+      <button onclick="closeTaskModal()" aria-label="Fermer" class="p-1 rounded hover:bg-slate-700">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form id="taskForm" class="space-y-4">
+      <div>
+        <label for="taskTitle" class="text-xs text-slate-400 uppercase tracking-wide">Titre</label>
+        <input id="taskTitle" type="text" required class="w-full px-4 py-2.5 rounded-lg text-sm mt-1"/>
+      </div>
+      <div>
+        <label for="taskDesc" class="text-xs text-slate-400 uppercase tracking-wide">Description</label>
+        <textarea id="taskDesc" rows="2" class="w-full px-4 py-2.5 rounded-lg text-sm mt-1 resize-none"></textarea>
+      </div>
+      <div class="modal-form-grid grid grid-cols-2 gap-3">
+        <div>
+          <label for="taskSubject" class="text-xs text-slate-400 uppercase tracking-wide">Matière</label>
+          <select id="taskSubject" class="w-full px-4 py-2.5 rounded-lg text-sm mt-1" required></select>
+        </div>
+        <div>
+          <label for="taskPriority" class="text-xs text-slate-400 uppercase tracking-wide">Priorité</label>
+          <select id="taskPriority" class="w-full px-4 py-2.5 rounded-lg text-sm mt-1">
+            <option value="low">Faible</option>
+            <option value="medium" selected>Moyenne</option>
+            <option value="high">Élevée</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-form-grid grid grid-cols-2 gap-3">
+        <div>
+          <label for="taskDue" class="text-xs text-slate-400 uppercase tracking-wide">Date d’échéance</label>
+          <input id="taskDue" type="date" class="w-full px-4 py-2.5 rounded-lg text-sm mt-1"/>
+        </div>
+        <div>
+          <label for="taskTime" class="text-xs text-slate-400 uppercase tracking-wide">Durée estimée (min)</label>
+          <input id="taskTime" type="number" min="5" step="5" value="30" class="w-full px-4 py-2.5 rounded-lg text-sm mt-1"/>
+        </div>
+      </div>
+      <div class="flex gap-2 pt-2">
+        <button type="submit" class="btn-primary flex-1 py-2.5 rounded-lg font-semibold text-sm">Enregistrer</button>
+        <button type="button" onclick="closeTaskModal()" class="flex-1 py-2.5 rounded-lg font-semibold text-sm bg-slate-700 hover:bg-slate-600 transition">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Subject Modal -->
+<div id="subjectModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+  <div class="modal-panel glass rounded-2xl w-full max-w-md p-6 fade-in">
+    <h3 class="text-xl font-bold mb-4">Gérer les matières</h3>
+    <div id="subjectList" class="space-y-2 mb-4 max-h-60 overflow-y-auto scrollbar"></div>
+    <div class="subject-add-form flex gap-2">
+      <input id="newSubject" type="text" placeholder="Nom de la matière…" aria-label="Nom de la nouvelle matière" class="flex-1 px-4 py-2 rounded-lg text-sm"/>
+      <input id="newSubjectColor" type="color" value="#8b5cf6" class="w-10 h-10 rounded-lg cursor-pointer border-0"/>
+      <button onclick="addSubject()" class="btn-primary px-4 py-2 rounded-lg text-sm font-semibold">Ajouter</button>
+    </div>
+    <button onclick="closeSubjectModal()" class="w-full mt-4 py-2 rounded-lg font-semibold text-sm bg-slate-700 hover:bg-slate-600 transition">Fermer</button>
+  </div>
+</div>
+</body>
+</html>
