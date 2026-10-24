@@ -1,0 +1,221 @@
+:root {
+    --bg: #0f172a;
+    --panel: #1e293b;
+    --panel-2: #273549;
+    --accent: #8b5cf6;
+    --accent-2: #6366f1;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+  }
+  * { font-family: 'Inter', system-ui, sans-serif; }
+  body {
+    background: radial-gradient(1200px 600px at 10% -10%, rgba(139,92,246,0.18), transparent),
+                radial-gradient(900px 500px at 110% 10%, rgba(99,102,241,0.15), transparent),
+                var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .glass {
+    background: rgba(30, 41, 59, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+  }
+  .scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+  .fade-in { animation: fadeIn .3s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+  .priority-high { background: linear-gradient(135deg, #ef4444, #f97316); }
+  .priority-medium { background: linear-gradient(135deg, #f59e0b, #eab308); }
+  .priority-low { background: linear-gradient(135deg, #10b981, #06b6d4); }
+  .tab-active {
+    background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(99,102,241,0.25));
+    color: #fff;
+    border-color: rgba(139,92,246,0.5);
+  }
+  .task-card { transition: all .2s ease; }
+  .task-card:hover { transform: translateY(-2px); border-color: rgba(139,92,246,0.5); }
+  .done .task-title { text-decoration: line-through; color: var(--muted); }
+  input, select, textarea {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    transition: all .2s;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 25px -10px rgba(139,92,246,0.5); }
+  .ring-pulse { animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(139,92,246,0.4); }
+    50% { box-shadow: 0 0 0 20px rgba(139,92,246,0); }
+  }
+  .calendar-cell { min-height: 90px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 500;
+  }
+  .chart-panel { min-width: 0; }
+  .modal-panel {
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .calendar-day-name { display: none; }
+  .app-shell { flex-direction: column; }
+  .app-shell > aside {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: .75rem;
+    border-right: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, .2);
+  }
+  .app-shell > aside .sidebar-brand { margin-bottom: .5rem; }
+  .app-shell > aside .app-nav { flex-direction: row; gap: .25rem; overflow-x: hidden; }
+  .app-shell > aside .app-nav .nav-btn {
+    flex: 1 0 0;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: center;
+    gap: .25rem;
+    padding: .5rem .125rem;
+    font-size: .625rem;
+    line-height: 1.15;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .app-shell > aside .app-nav .nav-btn svg { width: 1.125rem; height: 1.125rem; }
+  .app-shell > aside .weekly-goal { margin-top: .5rem; padding: .5rem .75rem; }
+  .app-shell > aside .weekly-goal p { display: none; }
+  .app-shell > main.main-content { width: 100%; min-width: 0; padding: 1rem; padding-bottom: 2rem; }
+  .app-shell > main.main-content .page-topbar {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: .75rem;
+      margin-bottom: 1.25rem;
+  }
+  .app-shell > main.main-content .page-topbar h2 { font-size: 1.25rem; line-height: 1.75rem; }
+  .app-shell > main.main-content .page-topbar > div:first-child { min-width: 0; }
+  .app-shell > main.main-content .page-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .5rem; width: 100%; }
+  .app-shell > main.main-content .page-actions .today-date { padding: .5rem .625rem; font-size: .75rem; }
+  .app-shell > main.main-content .page-actions .new-task-button { justify-content: center; padding: .5rem .625rem; font-size: .75rem; }
+  .dashboard-grid, .stats-grid { gap: 1rem; }
+  .app-shell > main.main-content .dashboard-panel,
+  .app-shell > main.main-content .stats-panel { padding: 1rem; }
+  .task-filters { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; }
+  .task-filter-selects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+  .task-filter-selects select { width: 100%; min-width: 0; }
+  .task-filter-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; }
+  .task-filter-tools input { width: 100%; min-width: 0; }
+  .task-filter-tools button { white-space: nowrap; }
+  @media (max-width: 420px) {
+    .task-filter-selects { gap: .375rem; }
+    .task-filter-selects select { padding: .5rem .375rem; font-size: .7rem; }
+    .task-filter-tools { gap: .5rem; }
+    .task-filter-tools input { padding: .5rem .625rem; font-size: .75rem; }
+    .task-filter-tools button { padding: .5rem .625rem; font-size: .75rem; }
+  }
+  .app-shell > main.main-content .calendar-panel { padding: .75rem; }
+  .calendar-toolbar { gap: .5rem; margin-bottom: .75rem; }
+  .calendar-toolbar h3 { font-size: .875rem; text-align: center; }
+  .calendar-weekdays { display: none; }
+  #calendarGrid { display: flex; flex-direction: column; gap: .5rem; }
+  .app-shell > main.main-content .calendar-cell {
+    display: grid;
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: .5rem;
+    min-height: 3.25rem;
+    padding: .5rem;
+  }
+  .calendar-cell > div:first-child { flex-direction: column; align-items: flex-start; gap: .125rem; margin: 0; }
+  .calendar-cell > div:nth-child(2) { grid-column: 2; grid-row: 1; display: flex; flex-wrap: wrap; gap: .375rem; }
+  .calendar-day-name { display: inline; font-size: .625rem; text-transform: uppercase; color: var(--muted); }
+  .calendar-cell > div:nth-child(2) > div { max-width: 100%; min-height: 2rem; padding: .375rem .5rem; white-space: normal; }
+  .app-shell > main.main-content .timer-panel { padding: 1rem; }
+  .app-shell > main.main-content .timer-modes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-bottom: 1.5rem; }
+  .app-shell > main.main-content .timer-mode { padding: .625rem .375rem; font-size: .7rem; line-height: 1.25; }
+  .app-shell > main.main-content .timer-mode:first-child { grid-column: 1 / -1; }
+  .app-shell > main.main-content .timer-clock { width: min(72vw, 18rem); height: auto; aspect-ratio: 1; margin-bottom: 1.5rem; }
+  .app-shell > main.main-content .timer-clock-display { font-size: 3rem; }
+  .app-shell > main.main-content .timer-controls { flex-wrap: wrap; }
+  .app-shell > main.main-content .timer-stats { gap: 1.5rem; }
+  #taskModal .modal-panel, #subjectModal .modal-panel { padding: 1rem; }
+  #taskForm .modal-form-grid { grid-template-columns: minmax(0, 1fr); }
+  #subjectModal .subject-add-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  #subjectModal .subject-add-form button { grid-column: 1 / -1; }
+  @media (min-width: 768px) {
+    .app-shell { flex-direction: row; }
+    .app-shell > aside {
+      width: 13rem;
+      height: 100vh;
+      min-height: 100vh;
+      padding: 1rem;
+      border-right: 1px solid rgba(148, 163, 184, .2);
+      border-bottom: 0;
+    }
+    .app-shell > aside .sidebar-brand { margin-bottom: 2rem; }
+    .app-shell > aside .app-nav { flex-direction: column; overflow: visible; }
+    .app-shell > aside .app-nav .nav-btn {
+      flex: none;
+      flex-direction: row;
+      justify-content: flex-start;
+      gap: .75rem;
+      padding: .625rem 1rem;
+      font-size: .875rem;
+      text-align: left;
+      white-space: normal;
+    }
+    .app-shell > aside .weekly-goal { margin-top: 1rem; padding: 1rem; }
+    .app-shell > aside .weekly-goal p { display: block; }
+    .app-shell > main.main-content { width: auto; padding: 1.5rem; }
+    .app-shell > main.main-content .page-topbar {
+      align-items: center;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .app-shell > main.main-content .page-topbar h2 { font-size: 1.5rem; line-height: 2rem; }
+    .app-shell > main.main-content .page-actions { display: flex; gap: .75rem; width: auto; }
+    .app-shell > main.main-content .page-actions .today-date { padding: .5rem 1rem; font-size: .875rem; }
+    .app-shell > main.main-content .page-actions .new-task-button { padding: .5rem 1rem; font-size: .875rem; }
+    .app-shell > main.main-content .dashboard-panel,
+    .app-shell > main.main-content .stats-panel { padding: 1.5rem; }
+    .app-shell > main.main-content .calendar-panel { padding: 1.5rem; }
+    .calendar-toolbar { margin-bottom: 1.5rem; }
+    .calendar-toolbar h3 { font-size: 1.125rem; }
+    .calendar-weekdays { display: grid; }
+    #calendarGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .5rem; }
+    .app-shell > main.main-content .calendar-cell { display: block; min-height: 90px; padding: .5rem; }
+    .calendar-cell > div:first-child { flex-direction: row; align-items: center; gap: 0; margin-bottom: .25rem; }
+    .calendar-cell > div:nth-child(2) { display: block; }
+    .calendar-day-name { display: none; }
+    .calendar-cell > div:nth-child(2) > div { min-height: 0; padding: .25rem .375rem; white-space: nowrap; }
+    .app-shell > main.main-content .timer-panel { padding: 2rem; }
+    .app-shell > main.main-content .timer-modes { display: flex; gap: .5rem; margin-bottom: 2rem; }
+    .app-shell > main.main-content .timer-mode { padding: .5rem 1rem; font-size: .875rem; }
+    .app-shell > main.main-content .timer-mode:first-child { grid-column: auto; }
+    .app-shell > main.main-content .timer-clock { width: 18rem; height: 18rem; margin-bottom: 2rem; }
+    .app-shell > main.main-content .timer-clock-display { font-size: 3.75rem; }
+    .app-shell > main.main-content .timer-controls { flex-wrap: nowrap; }
+    #taskModal .modal-panel, #subjectModal .modal-panel { padding: 1.5rem; }
+    #taskForm .modal-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    #subjectModal .subject-add-form { display: flex; }
+    #subjectModal .subject-add-form button { grid-column: auto; }
+  }
+  @media (min-width: 1200px) {
+    .app-shell > aside { width: 16rem; padding: 1.25rem; }
+    .app-shell > main.main-content { padding: 2rem; }
+  }
